@@ -1,4 +1,4 @@
-# xk6-pubsub[WIP:heavy_exclamation_mark:]
+# xk6-pubsub
 
 This is a [k6](https://github.com/loadimpact/k6) extension using the [xk6](https://github.com/k6io/xk6) system.
 
@@ -38,27 +38,24 @@ export PUBSUB_EMULATOR_HOST=<emulator_host>
 
 ```javascript
 import { check } from 'k6';
-import pubsub from 'k6/x/pubsub';
-
-// Creates a new publisher for ProjectID with a timeout of 2 seconds for the publisher
-const publisher = new pubsub.Publisher('ProjectID', 2);
+import { publisher, publish } from 'k6/x/pubsub';
 
 export default function () {
-    let error = publisher.publish('topic_name', 'message data');
+    // Creates a new publisher for ProjectID with a timeout of 2 seconds
+    // with debug and trace mod enabled
+    const client = publisher('', 2, true, true)
+    let error = publish(client, 'topic_name', 'message data');
 
     check(error, {
-        "is sent": err => err === undefined
+        "is sent": err => err === null
     });
+
+    client.close()
 }
 ```
 
 Result output:
-
-:warning: **You will receive an error**: `could not check if topic <topic_name> exists: context deadline exceeded`
-
 ```
-$ ./k6 run example.js
-
           /\      |‾‾| /‾‾/   /‾‾/   
      /\  /  \     |  |/  /   /  /    
     /  \/    \    |     (   /   ‾‾\  
@@ -66,19 +63,25 @@ $ ./k6 run example.js
   / __________ \  |__| \__\ \_____/ .io
 
   execution: local
-     script: test.js
+     script: example.js
      output: -
 
   scenarios: (100.00%) 1 scenario, 1 max VUs, 10m30s max duration (incl. graceful stop):
            * default: 1 iterations for each of 1 VUs (maxDuration: 10m0s, gracefulStop: 30s)
 
-running (00m05.0s), 0/1 VUs, 1 complete and 0 interrupted iterations
-default ✓ [======================================] 1 VUs  00m05.0s/10m0s  1/1 iters, 1 per VU
+[watermill] 2021/03/17 22:17:04.450779 publisher.go:116: 	level=TRACE msg="Sending message to Google PubSub" message_uuid=Y3mriTgx4SuWo2ZxMgg8FF topic=topic_name 
+[watermill] 2021/03/17 22:17:04.464942 publisher.go:131: 	level=TRACE msg="Message published to Google PubSub" message_uuid=Y3mriTgx4SuWo2ZxMgg8FF topic=topic_name 
+[watermill] 2021/03/17 22:17:04.465082 publisher.go:139: 	level=INFO  msg="Closing Google PubSub publisher" 
+[watermill] 2021/03/17 22:17:04.465128 publisher.go:153: 	level=INFO  msg="Google PubSub publisher closed" 
 
-     data_received........: 0 B 0 B/s
-     data_sent............: 0 B 0 B/s
-     iteration_duration...: avg=5s min=5s med=5s max=5s p(90)=5s p(95)=5s
-     iterations...........: 1   0.199914/s
-     vus..................: 1   min=1 max=1
-     vus_max..............: 1   min=1 max=1
+running (00m00.0s), 0/1 VUs, 1 complete and 0 interrupted iterations
+default ✓ [======================================] 1 VUs  00m00.0s/10m0s  1/1 iters, 1 per VU
+
+     ✓ is sent
+
+     checks...............: 100.00% ✓ 1 ✗ 0
+     data_received........: 0 B     0 B/s
+     data_sent............: 0 B     0 B/s
+     iteration_duration...: avg=27.14ms min=27.14ms med=27.14ms max=27.14ms p(90)=27.14ms p(95)=27.14ms
+     iterations...........: 1       35.356928/s
 ```
