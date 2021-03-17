@@ -1,6 +1,7 @@
 import { check } from 'k6';
 import pubsub from 'k6/x/pubsub';
 
+// Creates a new publisher for ProjectID with a timeout of 2 seconds for the publisher
 const publisher = new pubsub.Publisher('ProjectID', 2);
 
 export default function () {
