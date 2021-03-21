@@ -1,15 +1,28 @@
 import { check } from 'k6';
-import { publisher, publish } from 'k6/x/pubsub';
+import pubsub from 'k6/x/pubsub';
 
 export default function () {
-    // Creates a new publisher for ProjectID with a timeout of 2 seconds
-    // with debug and trace mod enabled
-    const client = publisher('', 2, true, true)
-    let error = publish(client, 'topic_name', 'message data');
+    /**
+     * Creates a new publisher client that will be used by publisher.
+     * publishTimeout value is 5 seconds by default.
+     * debug and trace are disabled by default.
+     */
+    const client = pubsub.publisher({
+        projectID: "",
+        publishTimeout: 2,
+        debug: true,
+        trace: true,
+        doNotCreateTopicIfMissing: true
+    });
+    let error = pubsub.publish(client, 'topic_name', 'message data');
 
     check(error, {
         "is sent": err => err === null
     });
 
+    /**
+     * The publisher client must be closed after a message was provided.
+     * It will trigger the sending process.
+     */
     client.close()
 }

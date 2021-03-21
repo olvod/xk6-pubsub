@@ -12,6 +12,8 @@ import (
 
 	"github.com/loadimpact/k6/js/modules"
 	"github.com/loadimpact/k6/lib"
+
+	"github.com/mitchellh/mapstructure"
 )
 
 // Register the extension on module initialization, available to
@@ -24,24 +26,41 @@ func init() {
 // See https://cloud.google.com/pubsub/docs/overview
 type PubSub struct{}
 
+// publisherConf provides a Pub/Sub publisher client configuration. This configuration
+// structure can be used on a client side. All parameters are optional.
+type publisherConf struct {
+	ProjectID                 string
+	PublishTimeout            int
+	Debug                     bool
+	Trace                     bool
+	DoNotCreateTopicIfMissing bool
+}
+
 // Publisher is the basic wrapper for Google Pub/Sub publisher and uses
 // watermill as a client. See https://github.com/ThreeDotsLabs/watermill/
 //
 // Publisher represents the constructor and creates an instance of
 // googlecloud.Publisher with provided projectID and publishTimeout.
 // Publisher uses watermill StdLoggerAdapter logger.
-func (ps *PubSub) Publisher(projectID string, publishTimeout int, debug, trace bool) *googlecloud.Publisher {
-	if publishTimeout < 1 {
-		publishTimeout = 5
+func (ps *PubSub) Publisher(config map[string]interface{}) *googlecloud.Publisher {
+	cnf := &publisherConf{}
+	err := mapstructure.Decode(config, cnf)
+	if err != nil {
+		log.Fatalf("xk6-pubsub: unable to read publisher config: %v", err)
+	}
+
+	if cnf.PublishTimeout < 1 {
+		cnf.PublishTimeout = 5
 	}
 
 	client, err := googlecloud.NewPublisher(
 		googlecloud.PublisherConfig{
-			ProjectID: projectID,
-			Marshaler: googlecloud.DefaultMarshalerUnmarshaler{},
-			PublishTimeout: time.Second * time.Duration(publishTimeout),
+			ProjectID:      cnf.ProjectID,
+			Marshaler:      googlecloud.DefaultMarshalerUnmarshaler{},
+			PublishTimeout: time.Second * time.Duration(cnf.PublishTimeout),
+			DoNotCreateTopicIfMissing: cnf.DoNotCreateTopicIfMissing,
 		},
-		watermill.NewStdLogger(debug, trace),
+		watermill.NewStdLogger(cnf.Debug, cnf.Trace),
 	)
 
 	if err != nil {
