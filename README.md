@@ -1,6 +1,6 @@
 # xk6-pubsub
 
-This is a [k6](https://github.com/loadimpact/k6) extension using the [xk6](https://github.com/k6io/xk6) system.
+This is a [k6](https://go.k6.io/k6) extension using the [xk6](https://github.com/k6io/xk6) system.
 
 | :exclamation: This is a proof of concept, isn't supported by the k6 team, and may break in the future. USE AT YOUR OWN RISK! |
 |------|
@@ -14,12 +14,12 @@ To build a `k6` binary with this extension, first ensure you have the prerequisi
 
 1. Install `xk6` framework for extending `k6`:
 ```shell
-go get -u github.com/k6io/xk6/cmd/xk6
+go install github.com/k6io/xk6/cmd/xk6@latest
 ```
 
 2. Build the binary:
 ```shell
-xk6 build v0.31.0 --with github.com/olvod/xk6-pubsub
+xk6 build --with github.com/olvod/xk6-pubsub@latest
 ```
 
 3. Setup Google Pub/Sub configuration via environment variables:

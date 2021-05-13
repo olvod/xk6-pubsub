@@ -5,6 +5,6 @@ go 1.15
 require (
 	github.com/ThreeDotsLabs/watermill v1.2.0-rc.3
 	github.com/ThreeDotsLabs/watermill-googlecloud v1.0.6
-	github.com/loadimpact/k6 v0.31.0
-	github.com/mitchellh/mapstructure v0.0.0-20180220230111-00c29f56e238
+	github.com/mitchellh/mapstructure v1.1.2
+	go.k6.io/k6 v0.32.0
 )

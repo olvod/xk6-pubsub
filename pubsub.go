@@ -10,8 +10,8 @@ import (
 	"github.com/ThreeDotsLabs/watermill-googlecloud/pkg/googlecloud"
 	"github.com/ThreeDotsLabs/watermill/message"
 
-	"github.com/loadimpact/k6/js/modules"
-	"github.com/loadimpact/k6/lib"
+	"go.k6.io/k6/js/modules"
+	"go.k6.io/k6/lib"
 
 	"github.com/mitchellh/mapstructure"
 )
