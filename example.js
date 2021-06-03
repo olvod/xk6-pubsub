@@ -1,4 +1,4 @@
-import { check } from 'k6';
+import {check} from 'k6';
 import pubsub from 'k6/x/pubsub';
 
 export default function () {
@@ -8,11 +8,12 @@ export default function () {
      * debug and trace are disabled by default.
      */
     const client = pubsub.publisher({
-        projectID: "",
-        publishTimeout: 2,
+        projectID: __ENV.PUBSUB_PROJECT_ID || "",
+        credentials: __ENV.PUBSUB_CREDENTIALS || "",
+        publishTimeout: 5,
         debug: true,
         trace: true,
-        doNotCreateTopicIfMissing: true
+        doNotCreateTopicIfMissing: false
     });
     let error = pubsub.publish(client, 'topic_name', 'message data');
 
