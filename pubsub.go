@@ -76,7 +76,7 @@ func (ps *PubSub) Publisher(config map[string]interface{}) *googlecloud.Publishe
 // Publish publishes a message to the provided topic using provided
 // googlecloud.Publisher. The msg value must be passed as string
 // and will be converted to bytes sequence before publishing.
-func (ps *PubSub) Publish(ctx context.Context, p *googlecloud.Publisher, topic, msg string) error {
+func (ps *PubSub) Publish(ctx context.Context, p *googlecloud.Publisher, topic, msg string, attributes map[string]string) error {
 	state := lib.GetState(ctx)
 
 	if state == nil {
@@ -85,9 +85,11 @@ func (ps *PubSub) Publish(ctx context.Context, p *googlecloud.Publisher, topic, 
 		return err
 	}
 
+	m := message.NewMessage(watermill.NewShortUUID(), []byte(msg))
+	m.Metadata = attributes
 	err := p.Publish(
 		topic,
-		message.NewMessage(watermill.NewShortUUID(), []byte(msg)),
+		m,
 	)
 
 	if err != nil {

@@ -1,4 +1,4 @@
-import {check} from 'k6';
+import { check } from 'k6';
 import pubsub from 'k6/x/pubsub';
 
 export default function () {
@@ -15,7 +15,7 @@ export default function () {
         trace: true,
         doNotCreateTopicIfMissing: false
     });
-    let error = pubsub.publish(client, 'topic_name', 'message data');
+    let error = pubsub.publish(client, 'topic_name', 'message data', {key:"value",key2:"value2"});
 
     check(error, {
         "is sent": err => err === null
